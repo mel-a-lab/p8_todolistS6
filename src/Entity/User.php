@@ -2,7 +2,9 @@
 
 namespace App\Entity;
 
+use App\Entity\Task;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -27,6 +29,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\NotBlank(message: 'Vous devez saisir une adresse email.')]
     #[Assert\Email(message: 'Le format de l\'adresse n\'est pas correcte.')]
     private string $email;
+
+    #[ORM\OneToMany(targetEntity: Task::class, mappedBy: 'user')]
+    private $tasks;
+
+    public function __construct()
+{
+    $this->tasks = new ArrayCollection();
+}
 
     public function getId(): int
     {
