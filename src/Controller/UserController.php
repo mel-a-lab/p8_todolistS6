@@ -8,31 +8,35 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Doctrine\ORM\EntityManagerInterface;
 
 class UserController extends AbstractController
 {
     #[Route('/users', name: 'user_list')]
-    public function listAction()
+    public function listAction(EntityManagerInterface $entityManager)
     {
+        $userRepository = $entityManager->getRepository(User::class);
         return $this->render('user/list.html.twig', [
-            'users' => $this->getDoctrine()->getRepository(User::class)->findAll()
+            'users' => $userRepository->findAll()
         ]);
     }
 
     #[Route('/users/create', name: 'user_create')]
-    public function createAction(Request $request, UserPasswordHasherInterface $passwordHasher)
-    {
+    public function createAction(
+        Request $request, 
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager
+    ) {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->getDoctrine()->getManager();
             $password = $passwordHasher->hashPassword($user, $user->getPassword());
             $user->setPassword($password);
 
-            $em->persist($user);
-            $em->flush();
+            $entityManager->persist($user);
+            $entityManager->flush();
 
             $this->addFlash('success', "L'utilisateur a bien été ajouté.");
 
@@ -43,8 +47,12 @@ class UserController extends AbstractController
     }
 
     #[Route('/users/{id}/edit', name: 'user_edit')]
-    public function editAction(User $user, Request $request, UserPasswordHasherInterface $passwordHasher)
-    {
+    public function editAction(
+        User $user, 
+        Request $request, 
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $entityManager
+    ) {
         $form = $this->createForm(UserType::class, $user);
         $form->handleRequest($request);
 
@@ -52,7 +60,7 @@ class UserController extends AbstractController
             $password = $passwordHasher->hashPassword($user, $user->getPassword());
             $user->setPassword($password);
 
-            $this->getDoctrine()->getManager()->flush();
+            $entityManager->flush();
 
             $this->addFlash('success', "L'utilisateur a bien été modifié");
 
