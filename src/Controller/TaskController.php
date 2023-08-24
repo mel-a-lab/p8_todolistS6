@@ -81,6 +81,19 @@ class TaskController extends AbstractController
     #[Route('/tasks/{id}/delete', name: 'task_delete')]
     public function deleteTaskAction(Task $task)
     {
+        $currentUser = $this->getUser();
+
+        // Si l'utilisateur actuel est différent de l'utilisateur qui a créé la tâche
+        if ($currentUser !== $task->getUser()) {
+            // Si la tâche appartient à "user_anonyme" et l'utilisateur actuel a le rôle "ROLE_ADMIN"
+            if ($task->getUser()->getUsername() === 'user_anonyme' && in_array('ROLE_ADMIN', $currentUser->getRoles())) {
+                // autorisé à supprimer la tâche
+            } else {
+                $this->addFlash('error', 'Vous n\'avez pas le droit de supprimer cette tâche.');
+                return $this->redirectToRoute('task_list');
+            }
+        }
+
         $this->entityManager->remove($task);
         $this->entityManager->flush();
 
