@@ -2,16 +2,17 @@
 
 namespace App\Tests;
 
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class TaskControllerTest extends WebTestCase
 {
     public function testTaskListPage(): void
     {
-        $client = static::createClient([], [
-            'PHP_AUTH_USER' => 'fleur',
-            'PHP_AUTH_PW' => 'test',
-        ]);
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('mela.dussenne@gmail.com');
+        $client->loginUser($testUser);
 
         $client->request('GET', '/tasks');
 
@@ -25,10 +26,10 @@ class TaskControllerTest extends WebTestCase
 
     public function testTaskCreation(): void
     {
-        $client = static::createClient([], [
-            'PHP_AUTH_USER' => 'fleur',
-            'PHP_AUTH_PW' => 'test',
-        ]);
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('mela.dussenne@gmail.com');
+        $client->loginUser($testUser);
 
         $crawler = $client->request('GET', '/tasks/create');
 
@@ -37,13 +38,13 @@ class TaskControllerTest extends WebTestCase
         $form = $crawler->selectButton('Ajouter')->form();
         // Fill in the form fields here
         $form['task[title]'] = 'Nouvelle tâche';
-        $form['task[description]'] = 'Description de la tâche';
+        $form['task[content]'] = 'Description de la tâche';
 
         $client->submit($form);
 
         $this->assertResponseRedirects('/tasks');
         // You can add assertions for flash messages or other post-submit behavior
-        $this->assertNotEmpty($client->getContainer()->get('session')->getFlashBag()->get('success'));
+       // $this->assertNotEmpty($client->getContainer()->get('session.factory')->getFlashBag()->get('success'));
     }
 
     // Add more test methods for other actions (edit, toggle, delete) in a similar manner
