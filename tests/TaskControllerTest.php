@@ -119,5 +119,38 @@ class TaskControllerTest extends WebTestCase
         $this->assertNull($deletedTask);
     }
 
+    public function testAddTask(): void
+    {
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('mela.dussenne@gmail.com');
+        $client->loginUser($testUser);
+
+        // Récupérez le nombre de tâches avant d'ajouter une nouvelle tâche
+        $entityManager = static::getContainer()->get('doctrine')->getManager();
+        $taskRepository = $entityManager->getRepository(Task::class);
+        $initialTaskCount = count($taskRepository->findAll());
+
+        // Accédez à la page de création de tâches
+        $crawler = $client->request('GET', '/tasks/create');
+
+        // Remplissez le formulaire pour ajouter une nouvelle tâche
+        $form = $crawler->selectButton('Ajouter')->form();
+        $form['task[title]'] = 'Nouvelle tâche';
+        $form['task[content]'] = 'Description de la nouvelle tâche';
+
+        // Soumettez le formulaire
+        $client->submit($form);
+
+        // Récupérez le nombre de tâches après avoir ajouté une nouvelle tâche
+        $updatedTaskCount = count($taskRepository->findAll());
+
+        // Assurez-vous que le nombre de tâches a augmenté après la soumission
+        $this->assertEquals($initialTaskCount + 1, $updatedTaskCount);
+
+        // Vous pouvez également ajouter d'autres assertions pour vérifier que la tâche a été ajoutée avec succès, par exemple, en vérifiant la redirection ou en cherchant la tâche dans la base de données.
+    }
+
+
 
 }
