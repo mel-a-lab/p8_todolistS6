@@ -2,6 +2,7 @@
 
 namespace App\Tests;
 
+use App\Entity\Task;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -44,8 +45,40 @@ class TaskControllerTest extends WebTestCase
 
         $this->assertResponseRedirects('/tasks');
         // You can add assertions for flash messages or other post-submit behavior
-       // $this->assertNotEmpty($client->getContainer()->get('session.factory')->getFlashBag()->get('success'));
+        // $this->assertNotEmpty($client->getContainer()->get('session.factory')->getFlashBag()->get('success'));
     }
 
-    // Add more test methods for other actions (edit, toggle, delete) in a similar manner
+    public function testDeleteTaskByAdmin(): void
+    {
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $adminUser = $userRepository->findOneByEmail('mela.dussenne@gmail.com');
+        $client->loginUser($adminUser);
+
+        // Créez une tâche avec un utilisateur anonyme
+        $taskTitle = 'Tâche de l\'utilisateur anonyme';
+        $taskContent = 'Contenu de la tâche de l\'utilisateur anonyme';
+
+        $crawler = $client->request('GET', '/tasks/create');
+        $form = $crawler->selectButton('Ajouter')->form();
+        $form['task[title]'] = $taskTitle;
+        $form['task[content]'] = $taskContent;
+
+        $client->submit($form);
+
+        // Récupérez la tâche créée
+        $entityManager = static::getContainer()->get('doctrine')->getManager();
+        $taskRepository = $entityManager->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['title' => $taskTitle]);
+
+        // Assurez-vous que la tâche a bien été créée
+        $this->assertInstanceOf(Task::class, $task);
+
+        // Maintenant, testez la suppression de la tâche par l'administrateur
+        $client->request('GET', '/tasks/' . $task->getId() . '/delete');
+
+        $this->assertResponseRedirects('/tasks');
+        // Vous pouvez ajouter des assertions supplémentaires pour vérifier que la tâche a été supprimée avec succès.
+    }
+
 }
