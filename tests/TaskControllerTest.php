@@ -81,4 +81,43 @@ class TaskControllerTest extends WebTestCase
         // Vous pouvez ajouter des assertions supplémentaires pour vérifier que la tâche a été supprimée avec succès.
     }
 
+    public function testDeleteTask(): void
+    {
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('mela.dussenne@gmail.com');
+        $client->loginUser($testUser);
+
+        // Créez une tâche
+        $taskTitle = 'Tâche de test à supprimer';
+        $taskContent = 'Contenu de la tâche de test à supprimer';
+
+        $crawler = $client->request('GET', '/tasks/create');
+        $form = $crawler->selectButton('Ajouter')->form();
+        $form['task[title]'] = $taskTitle;
+        $form['task[content]'] = $taskContent;
+
+        $client->submit($form);
+
+        // Récupérez la tâche créée
+        $entityManager = static::getContainer()->get('doctrine')->getManager();
+        $taskRepository = $entityManager->getRepository(Task::class);
+        $task = $taskRepository->findOneBy(['title' => $taskTitle]);
+
+        // Assurez-vous que la tâche a bien été créée
+        $this->assertInstanceOf(Task::class, $task);
+
+        // Maintenant, testez la suppression de la tâche
+        $client->request('GET', '/tasks/' . $task->getId() . '/delete');
+
+        $this->assertResponseRedirects('/tasks');
+
+        // Vous pouvez ajouter des assertions supplémentaires pour vérifier que la tâche a été supprimée avec succès.
+
+        // Vérifiez que la tâche n'existe plus dans la base de données
+        $deletedTask = $taskRepository->find($task->getId());
+        $this->assertNull($deletedTask);
+    }
+
+
 }
