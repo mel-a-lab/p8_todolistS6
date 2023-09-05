@@ -148,8 +148,31 @@ class TaskControllerTest extends WebTestCase
         // Assurez-vous que le nombre de tâches a augmenté après la soumission
         $this->assertEquals($initialTaskCount + 1, $updatedTaskCount);
 
-        // Vous pouvez également ajouter d'autres assertions pour vérifier que la tâche a été ajoutée avec succès, par exemple, en vérifiant la redirection ou en cherchant la tâche dans la base de données.
     }
+
+    public function testTaskCountOnPage(): void
+    {
+        $client = static::createClient();
+        $userRepository = static::getContainer()->get(UserRepository::class);
+        $testUser = $userRepository->findOneByEmail('mela.dussenne@gmail.com');
+        $client->loginUser($testUser);
+
+        // Récupérez le nombre de tâches dans la base de données
+        $entityManager = static::getContainer()->get('doctrine')->getManager();
+        $taskRepository = $entityManager->getRepository(Task::class);
+        $taskCountInDatabase = count($taskRepository->findAll());
+
+        // Accédez à la page de la liste des tâches
+        $crawler = $client->request('GET', '/tasks');
+
+        // Récupérez le nombre de tâches affiché sur la page
+        $taskCountOnPage = $crawler->filter('.task')->count();
+
+        // Assurez-vous que le nombre de tâches sur la page correspond au nombre de tâches dans la base de données
+        $this->assertEquals($taskCountInDatabase, $taskCountOnPage);
+        
+    }
+
 
 
 
