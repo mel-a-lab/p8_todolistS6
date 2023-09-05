@@ -15,14 +15,46 @@ Si vous souhaitez apporter des modifications au projet Symfony, suivez ces étap
    - `SecurityController.php`: Ce fichier contient les actions liées à l'authentification, comme l'affichage du formulaire de connexion et la gestion des erreurs d'authentification. Vous pouvez le personnaliser pour modifier le comportement de l'authentification.
    - `security.yaml`: Ce fichier est au cœur de la configuration de sécurité de l'application. C'est ici que vous définissez les paramètres essentiels pour l'authentification et l'autorisation.
 
-2. **Modification des Fichiers**
+2. **Installation en Local**
+
+   Pour contribuer au projet et tester vos modifications en local, suivez ces étapes d'installation :
+   
+   - Clonez ce dépôt sur votre machine en utilisant la commande suivante :
+   
+     ```
+     git clone <lien-du-depot>
+     ```
+
+   - Assurez-vous d'avoir PHP, Composer et Symfony CLI installés sur votre système.
+
+   - Installez les dépendances du projet en exécutant la commande suivante dans le répertoire du projet :
+   
+     ```
+     composer install
+     ```
+
+   - Créez le fichier `.env` en copiant le fichier `.env.dist` et configurez-le en fonction des paramètres de votre environnement local, notamment la configuration de la base de données.
+
+   - Créez la base de données en exécutant la commande Symfony :
+   
+     ```
+     php bin/console doctrine:database:create
+     ```
+
+   - Appliquez les migrations pour créer les tables nécessaires :
+   
+     ```
+     php bin/console doctrine:migrations:migrate
+     ```
+
+3. **Modification des Fichiers**
 
    Une fois que vous avez identifié les fichiers à modifier, vous pouvez commencer à apporter des modifications :
    
    - Si vous souhaitez personnaliser le comportement de l'authentification, consultez `SecurityController.php`.
    - Pour configurer les aspects essentiels de l'authentification, comme les hacheurs de mots de passe, les fournisseurs d'utilisateurs, les pare-feu et les autorisations, consultez `security.yaml`.
 
-3. **Processus d'Authentification**
+4. **Processus d'Authentification**
 
    Il est crucial de comprendre comment fonctionne le processus d'authentification :
    
@@ -33,8 +65,10 @@ Si vous souhaitez apporter des modifications au projet Symfony, suivez ces étap
    - Si les informations sont incorrectes, Symfony gère l'affichage des erreurs en utilisant la vue de connexion.
    - Une fois authentifié, l'utilisateur peut accéder aux pages restreintes en fonction des autorisations définies dans `security.yaml`.
 
-4. **Stockage des Utilisateurs**
+5. **Stockage des Utilisateurs**
 
-   Les utilisateurs sont stockés dans la base de données de l'application, généralement dans une table `User`. La configuration de stockage des utilisateurs est spécifiée dans `security.yaml` sous la section `providers`. La base de données doit être configurée dans `.env`.
+   Les utilisateurs sont stockés dans la base de données de l'application, généralement dans une table `User`. La configuration de stockage des utilisateurs est spécifiée dans `security.yaml` sous la section `providers`. Assurez-vous que la base de données est correctement configurée dans le fichier `.env`.
 
+N'hésitez pas à contribuer au projet et à améliorer l'authentification avec Symfony !
 
+**Bonne contribution !**
