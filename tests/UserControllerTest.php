@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller;
 
+use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
@@ -11,7 +12,7 @@ class UserControllerTest extends WebTestCase
         $client = static::createClient();
         //active le profile
         $client->enableProfiler();
-        
+
         $userRepository = static::getContainer()->get(UserRepository::class);
 
         $testUser = $userRepository->findOneByEmail($email);
@@ -31,7 +32,7 @@ class UserControllerTest extends WebTestCase
     public function testCreateAction()
     {
         $client = $this->clientAdminLogin();
-        $client->followRedirects(true);
+       // $client->followRedirects(true);
     
         $crawler = $client->request('GET', '/users/create');
 
@@ -40,10 +41,10 @@ class UserControllerTest extends WebTestCase
         // Créez un formulaire de test pour la création d'un utilisateur et soumettez-le.
         $form = $crawler->selectButton('Ajouter')->form();
         // Remplissez le formulaire avec les données nécessaires pour la création d'un utilisateur.
-        $form['user[username]'] = 'dobs';
+        $form['user[username]'] = 'sdds';
         $form['user[password][first]'] = 'test';
         $form['user[password][second]'] = 'test';
-        $form['user[email]'] = 'melaeebe@gmail.com';
+        $form['user[email]'] = 'melae@gmail.com';
       //  $form['user[roles]'][0]->tick();
         $client->submit($form);
     //    var_dump($client->getResponse());
