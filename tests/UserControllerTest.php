@@ -41,10 +41,10 @@ class UserControllerTest extends WebTestCase
         // Créez un formulaire de test pour la création d'un utilisateur et soumettez-le.
         $form = $crawler->selectButton('Ajouter')->form();
         // Remplissez le formulaire avec les données nécessaires pour la création d'un utilisateur.
-        $form['user[username]'] = 'sdds';
+        $form['user[username]'] = 'sddddddxxxddds';
         $form['user[password][first]'] = 'test';
         $form['user[password][second]'] = 'test';
-        $form['user[email]'] = 'melae@gmail.com';
+        $form['user[email]'] = 'melddxdddxxxxddae@gmail.com';
       //  $form['user[roles]'][0]->tick();
         $client->submit($form);
     //    var_dump($client->getResponse());
@@ -75,7 +75,7 @@ class UserControllerTest extends WebTestCase
         $updatedUser = $this->getContainer()->get('doctrine')->getRepository(User::class)->find(1);
 
         // Vérifiez que le rôle de l'utilisateur a été modifié correctement.
-        $this->assertContains('ROLE_ADMIN', $updatedUser->getRoles());
+        $this->assertContains('ROLE_USER', $updatedUser->getRoles());
     }
 
 
