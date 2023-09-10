@@ -19,7 +19,7 @@ $allowedRemoteAddresses = array(
     '::1',
 );
 
-if (!in_array($_SERVER['REMOTE_ADDR'], $allowedRemoteAddresses)) {
+if (!in_array(getRemoteAddress(), $allowedRemoteAddresses)) {
     header('HTTP/1.0 403 Forbidden');
     exit('This script is only accessible from localhost.');
 }
@@ -32,6 +32,10 @@ $majorProblems = $symfonyRequirements->getFailedRequirements();
 $minorProblems = $symfonyRequirements->getFailedRecommendations();
 $hasMajorProblems = (bool) count($majorProblems);
 $hasMinorProblems = (bool) count($minorProblems);
+
+function getRemoteAddress() {
+    return $_SERVER['REMOTE_ADDR'];
+}
 
 ?>
 <!DOCTYPE html>
