@@ -10,7 +10,8 @@
  * ************** CAUTION **************
  */
 
-if (PHP_SAPI !== 'cli' && !isset($_SERVER['HTTP_HOST'])) {
+// Vérifie si nous sommes dans le contexte CLI ou si HTTP_HOST est défini
+if (isNotCli() && !isHttpHostSet()) {
     exit('This script cannot be run from the CLI. Run it from a browser.');
 }
 
@@ -37,6 +38,14 @@ if (class_exists('SymfonyRequirements')) {
 } else {
     // Handle the case where SymfonyRequirements class is not available
     exit('SymfonyRequirements class is not available. Please check your installation.');
+}
+
+function isNotCli() {
+    return PHP_SAPI !== 'cli';
+}
+
+function isHttpHostSet() {
+    return isset($_SERVER['HTTP_HOST']);
 }
 
 function getRemoteAddress() {

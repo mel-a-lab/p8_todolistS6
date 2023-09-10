@@ -34,6 +34,7 @@ class UserFixtures extends Fixture
         // Créez d'autres utilisateurs de test avec des données aléatoires
         for ($i = 0; $i < 10; $i++) {
             $user = new User();
+
             $user->setUsername($faker->userName);
             $user->setEmail($faker->email);
             $user->setRoles(['ROLE_USER']);
