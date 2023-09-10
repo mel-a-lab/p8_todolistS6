@@ -10,8 +10,14 @@
  * ************** CAUTION **************
  */
 
+require_once dirname(__FILE__).'/../var/SymfonyRequirements.php';
+
+use Symfony\Component\HttpFoundation\Request;
+
+$request = Request::createFromGlobals();
+
 // Vérifie si nous sommes dans le contexte CLI ou si HTTP_HOST est défini
-if (isNotCli() && !isHttpHostSet()) {
+if (!$request->server->has('HTTP_HOST') && !$request->server->has('REQUEST_URI')) {
     exit('This script cannot be run from the CLI. Run it from a browser.');
 }
 
@@ -20,12 +26,10 @@ $allowedRemoteAddresses = array(
     '::1',
 );
 
-if (!in_array(getRemoteAddress(), $allowedRemoteAddresses)) {
+if (!in_array($request->server->get('REMOTE_ADDR'), $allowedRemoteAddresses)) {
     header('HTTP/1.0 403 Forbidden');
     exit('This script is only accessible from localhost.');
 }
-
-require_once dirname(__FILE__).'/../var/SymfonyRequirements.php';
 
 // Check if the SymfonyRequirements class exists before instantiating it
 if (class_exists('SymfonyRequirements')) {
@@ -38,18 +42,6 @@ if (class_exists('SymfonyRequirements')) {
 } else {
     // Handle the case where SymfonyRequirements class is not available
     exit('SymfonyRequirements class is not available. Please check your installation.');
-}
-
-function isNotCli() {
-    return PHP_SAPI !== 'cli';
-}
-
-function isHttpHostSet() {
-    return isset($_SERVER['HTTP_HOST']);
-}
-
-function getRemoteAddress() {
-    return $_SERVER['REMOTE_ADDR'];
 }
 
 ?>
