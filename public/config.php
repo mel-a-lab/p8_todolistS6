@@ -26,12 +26,18 @@ if (!in_array(getRemoteAddress(), $allowedRemoteAddresses)) {
 
 require_once dirname(__FILE__).'/../var/SymfonyRequirements.php';
 
-$symfonyRequirements = new SymfonyRequirements();
+// Check if the SymfonyRequirements class exists before instantiating it
+if (class_exists('SymfonyRequirements')) {
+    $symfonyRequirements = new SymfonyRequirements();
 
-$majorProblems = $symfonyRequirements->getFailedRequirements();
-$minorProblems = $symfonyRequirements->getFailedRecommendations();
-$hasMajorProblems = (bool) count($majorProblems);
-$hasMinorProblems = (bool) count($minorProblems);
+    $majorProblems = $symfonyRequirements->getFailedRequirements();
+    $minorProblems = $symfonyRequirements->getFailedRecommendations();
+    $hasMajorProblems = (bool) count($majorProblems);
+    $hasMinorProblems = (bool) count($minorProblems);
+} else {
+    // Handle the case where SymfonyRequirements class is not available
+    exit('SymfonyRequirements class is not available. Please check your installation.');
+}
 
 function getRemoteAddress() {
     return $_SERVER['REMOTE_ADDR'];
