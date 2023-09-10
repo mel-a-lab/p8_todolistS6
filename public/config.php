@@ -14,10 +14,8 @@ require_once dirname(__FILE__).'/../var/SymfonyRequirements.php';
 
 use Symfony\Component\HttpFoundation\Request;
 
-$request = Request::createFromGlobals();
-
 // Vérifie si nous sommes dans le contexte CLI ou si HTTP_HOST est défini
-if (!$request->server->has('HTTP_HOST') && !$request->server->has('REQUEST_URI')) {
+if (!isset($_SERVER['HTTP_HOST']) && !isset($_SERVER['REQUEST_URI'])) {
     exit('This script cannot be run from the CLI. Run it from a browser.');
 }
 
@@ -26,13 +24,14 @@ $allowedRemoteAddresses = array(
     '::1',
 );
 
-if (!in_array($request->server->get('REMOTE_ADDR'), $allowedRemoteAddresses)) {
+if (!in_array($_SERVER['REMOTE_ADDR'], $allowedRemoteAddresses)) {
     header('HTTP/1.0 403 Forbidden');
     exit('This script is only accessible from localhost.');
 }
 
 // Check if the SymfonyRequirements class exists before instantiating it
 if (class_exists('SymfonyRequirements')) {
+    $request = Request::createFromGlobals();
     $symfonyRequirements = new SymfonyRequirements();
 
     $majorProblems = $symfonyRequirements->getFailedRequirements();
